@@ -10,8 +10,8 @@
 
     #car {
     position:absolute;
-    left:10px;
-    top:10px;
+    left:1000px;
+    top:150px;
 }
 
 </style>
@@ -26,8 +26,8 @@
 <body>
 
 <h1>LIAM'S CAR RACE</h1>
-<p>This is a paragraph.</p>
-<img id="car" src="red_car.jpeg" alt="W3Schools.com" style="position:absolute; top:50px" >
+<p id="score">SCORE: 0</p>
+<img id="car" src="red_car.jpeg" alt="W3Schools.com" style="position:absolute; top:150px; left:1000px" height="100px">
 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -37,16 +37,17 @@
     var stepsCounter =stepsBetweenObsticles;
     var pixlesForStep=25;
     var roadEndX = 300;
-    var carPos ={x: 250, y:150}
+    var carPos ={x: 1000, y:150}
     var score = 0;
     var lastObstacleId=0;
     var roadWidth = 300;
     var roadEndX = 900
+    var freeseObstcles=false;
 
     $(document).ready(function() {
 
              $("#car").css({top: carPos.y, left: carPos.y, position:'absolute'})
-            var myInterval = setInterval(updateObstacles, 100);
+            var myInterval = setInterval(updateObstacles, 200);
 
 
      //   $("#car").animate({left: "+=1000"}, 2000);
@@ -54,14 +55,16 @@
     });
 
     function updateObstacles() {
+        var move=pixlesForStep
+        if (freeseObstcles)move=0;
         var removeFirst = false;
         obsticles.forEach(item => {
             if (item.x < roadEndX){
-                item.x += pixlesForStep;
+                item.x += move;
                 $("#"+ item.obstcleName).css({top: item.y, left: item.x, position:'absolute'})
-                if ((item.x - carPos.x < 10 &&  item.x - carPos.x>0) &&
-                    (Math.abs(item.y - carPos.y)<5)) alert("CRASH!!!");
-                else score++;
+                if ((carPos.x - item.x< 20 &&  carPos.x-item.x>0) &&
+                    (Math.abs(item.y - carPos.y)<20)) alert("CRASH!!!");
+                else if (!freeseObstcles)  score++;
             }
             else  {
                 $("#"+ item.obstcleName).remove();
@@ -75,15 +78,16 @@
             else lastObstacleId =1;
             stepsCounter =0;
             var obstcleIdName = "obstcle" + lastObstacleId;
-            var newObstcleHtml = '<img id="' + obstcleIdName + '" src="bush.jpeg" alt="W3Schools.com" >';
+            var newObstcleHtml = '<img id="' + obstcleIdName + '" src="bush.jpeg" alt="W3Schools.com"  width="100px" height="100px">';
             $("body").append(newObstcleHtml);
-            var newObstcle = {obstcleName: obstcleIdName, x: Math.random(pixlesForStep * stepsBetweenObsticles), y: Math.random(roadWidth)+100 }
+            var newObstcle = {obstcleName: obstcleIdName, x: Math.floor( Math.random()* pixlesForStep * stepsBetweenObsticles), y: 100 + Math.floor(Math.random()* roadWidth)}
             $("#"+ obstcleIdName).css({top: newObstcle.y, left: newObstcle.x, position:'absolute'})
             obsticles.push(newObstcle)
             
 
         }
-        stepsCounter++;
+        if (!freeseObstcles)  stepsCounter++;
+        $("#score").text("SCORE: " + score);
     }
 
     $(document).keydown(function (event) {
@@ -102,6 +106,10 @@
             break
         case 39:
             carPos.x += 20
+            break
+        case 32:
+            if (freeseObstcles)freeseObstcles=false;
+            else freeseObstcles=true;
             break
     }
     $("#car").css({top: carPos.y, left: carPos.x, position:'absolute'})
