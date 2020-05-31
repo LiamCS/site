@@ -1,1 +1,115 @@
-hello from liam 123
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Page Title</title>
+
+<style>
+    h1 {color:red;}
+    p {color:blue;}
+
+    #car {
+    position:absolute;
+    left:10px;
+    top:10px;
+}
+
+</style>
+
+
+
+
+
+</head>
+
+
+<body>
+
+<h1>LIAM'S CAR RACE</h1>
+<p>This is a paragraph.</p>
+<img id="car" src="red_car.jpeg" alt="W3Schools.com" style="position:absolute; top:50px" >
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    var obsticles=[]
+    var stepsBetweenObsticles = 10;
+    var stepsCounter =stepsBetweenObsticles;
+    var pixlesForStep=25;
+    var roadEndX = 300;
+    var carPos ={x: 250, y:150}
+    var score = 0;
+    var lastObstacleId=0;
+    var roadWidth = 300;
+    var roadEndX = 900
+
+    $(document).ready(function() {
+
+             $("#car").css({top: carPos.y, left: carPos.y, position:'absolute'})
+            var myInterval = setInterval(updateObstacles, 100);
+
+
+     //   $("#car").animate({left: "+=1000"}, 2000);
+     //   $("#car").animate({left: "-=500"}, 1000);
+    });
+
+    function updateObstacles() {
+        var removeFirst = false;
+        obsticles.forEach(item => {
+            if (item.x < roadEndX){
+                item.x += pixlesForStep;
+                $("#"+ item.obstcleName).css({top: item.y, left: item.x, position:'absolute'})
+                if ((item.x - carPos.x < 10 &&  item.x - carPos.x>0) &&
+                    (Math.abs(item.y - carPos.y)<5)) alert("CRASH!!!");
+                else score++;
+            }
+            else  {
+                $("#"+ item.obstcleName).remove();
+                removeFirst= true;
+            }
+        });
+        if (removeFirst) obsticles.shift();
+
+        if (stepsCounter > stepsBetweenObsticles){
+            if (lastObstacleId < 50) lastObstacleId++
+            else lastObstacleId =1;
+            stepsCounter =0;
+            var obstcleIdName = "obstcle" + lastObstacleId;
+            var newObstcleHtml = '<img id="' + obstcleIdName + '" src="bush.jpeg" alt="W3Schools.com" >';
+            $("body").append(newObstcleHtml);
+            var newObstcle = {obstcleName: obstcleIdName, x: Math.random(pixlesForStep * stepsBetweenObsticles), y: Math.random(roadWidth)+100 }
+            $("#"+ obstcleIdName).css({top: newObstcle.y, left: newObstcle.x, position:'absolute'})
+            obsticles.push(newObstcle)
+            
+
+        }
+        stepsCounter++;
+    }
+
+    $(document).keydown(function (event) {
+    var keycode = (event.keyCode ? event.keyCode : event.which);
+   // alert(keycode)
+   // var pos = $("#car").position()
+    switch (keycode){
+        case 38:
+            if (carPos.y>120) carPos.y -= 20
+            break
+        case 40:
+            if (carPos.y <300) carPos.y += 20
+            break
+        case 37:
+            carPos.x -= 20
+            break
+        case 39:
+            carPos.x += 20
+            break
+    }
+    $("#car").css({top: carPos.y, left: carPos.x, position:'absolute'})
+        
+    
+});
+
+
+</script>
+</body>
+</html>
