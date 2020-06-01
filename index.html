@@ -8,28 +8,23 @@
     h1 {color:red;}
     p {color:blue;}
 
-    #car {
-    position:absolute;
-    left:1000px;
-    top:150px;
-}
+
+    #road{
+        background-color: dimgray;
+    }
 
 </style>
-
-
-
-
-
 </head>
-
 
 <body>
 
 <h1>LIAM'S CAR RACE</h1>
 <p id="score">SCORE: 0</p>
-<img id="car" src="red_car.jpeg" alt="W3Schools.com" style="position:absolute; top:150px; left:1000px" height="100px">
-
-
+<div id="road">
+    <hr>
+    <img id="car" src="red_car.jpeg" alt="W3Schools.com" style="position:absolute; top:150px; left:1000px">
+</div>
+<hr>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     var obsticles=[]
@@ -37,16 +32,22 @@
     var stepsCounter =stepsBetweenObsticles;
     var pixlesForStep=25;
     var roadEndX = 300;
-    var carPos ={x: 1000, y:150}
     var score = 0;
     var lastObstacleId=0;
-    var roadWidth = 300;
-    var roadEndX = 900
+    var roadWidth = 350;
+    var roadEndX = 1200;
+    var roadShift = 100;
     var freeseObstcles=false;
+    var carPos ={x: 1000, y: Math.floor(roadWidth/2)}
+    var carSize= {height: 70, width: 100};
+    var bushSize = {height: 50, width:50}  // 80 and not 100 in order to handle margin
+    
 
-    $(document).ready(function() {
 
-             $("#car").css({top: carPos.y, left: carPos.y, position:'absolute'})
+    $(document).ready(function() {roadShift
+
+            $("#road").css({top: roadShift, height: roadWidth, width: roadEndX, position:'absolute'})        
+             $("#car").css({top: carPos.y, left: carPos.x, position:'absolute', height: carSize.height})
             var myInterval = setInterval(updateObstacles, 200);
 
 
@@ -62,8 +63,14 @@
             if (item.x < roadEndX){
                 item.x += move;
                 $("#"+ item.obstcleName).css({top: item.y, left: item.x, position:'absolute'})
-                if ((carPos.x - item.x< 20 &&  carPos.x-item.x>0) &&
-                    (Math.abs(item.y - carPos.y)<20)) alert("CRASH!!!");
+                if ((carPos.x > (item.x - carSize.width) &&  carPos.x < (item.x + bushSize.width)) &&
+                     (carPos.y < (item.y + bushSize.height)  && carPos.y > (item.y - carSize.height)))
+                     {                       
+                        alert("CRASH!!!");
+                        $("#"+ item.obstcleName).remove();
+                        item.x = -1000; item.y= -1000;
+                        score -= 500;
+                     }
                 else if (!freeseObstcles)  score++;
             }
             else  {
@@ -78,9 +85,13 @@
             else lastObstacleId =1;
             stepsCounter =0;
             var obstcleIdName = "obstcle" + lastObstacleId;
-            var newObstcleHtml = '<img id="' + obstcleIdName + '" src="bush.jpeg" alt="W3Schools.com"  width="100px" height="100px">';
-            $("body").append(newObstcleHtml);
-            var newObstcle = {obstcleName: obstcleIdName, x: Math.floor( Math.random()* pixlesForStep * stepsBetweenObsticles), y: 100 + Math.floor(Math.random()* roadWidth)}
+            var newObstcleHtml = '<img id="' + obstcleIdName + '" src="bush.jpeg" alt="W3Schools.com"  width="' + bushSize.width +'px" height="' + bushSize.height +'px">';
+            $("#road").append(newObstcleHtml);
+            var newObstcle = {
+                obstcleName: obstcleIdName, 
+                x: Math.floor( Math.random()* pixlesForStep * stepsBetweenObsticles), 
+                y: Math.floor(Math.random()* (roadWidth - bushSize.height))
+            }
             $("#"+ obstcleIdName).css({top: newObstcle.y, left: newObstcle.x, position:'absolute'})
             obsticles.push(newObstcle)
             
@@ -96,10 +107,10 @@
    // var pos = $("#car").position()
     switch (keycode){
         case 38:
-            if (carPos.y>120) carPos.y -= 20
+            if (carPos.y>0) carPos.y -= 20
             break
         case 40:
-            if (carPos.y <300) carPos.y += 20
+            if (carPos.y <roadWidth-carSize.height) carPos.y += 20
             break
         case 37:
             carPos.x -= 20
